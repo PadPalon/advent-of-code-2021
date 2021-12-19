@@ -1,7 +1,5 @@
 package ch.neukom.advent2021.day14;
 
-import ch.neukom.advent2021.helper.InputResourceReader;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,9 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.LongStream;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
+import ch.neukom.advent2021.helper.InputResourceReader;
 
+import static java.util.stream.Collectors.*;
+
+/**
+ * Can't actually keep full polymer because it gets too big, but it's enough to just count occurrences of pairs
+ */
 public class Puzzle2 {
     public static final int ITERATIONS_TO_RUN = 40;
 
@@ -22,10 +24,7 @@ public class Puzzle2 {
             for (int i = 0; i < input.length() - 1; i++) {
                 pairCounts.put(input.substring(i, i + 2), 1L);
             }
-            Map<String, String> rules = reader.readInput()
-                    .skip(2)
-                    .map(line -> line.split(" -> "))
-                    .collect(toMap(split -> split[0], split -> split[1]));
+            Map<String, String> rules = Util.parseInsertions(reader.readInput().skip(2));
 
             for (int i = 0; i < ITERATIONS_TO_RUN; i++) {
                 applyInsertions(pairCounts, rules);
@@ -34,14 +33,14 @@ public class Puzzle2 {
             pairCounts.put(input.substring(input.length() - 1), 1L); // add a singular count of the last character of the input
 
             long[] characterCounts = pairCounts.entrySet()
-                    .stream()
-                    .collect(groupingBy(entry -> entry.getKey().charAt(0)))
-                    .values()
-                    .stream()
-                    .map(Collection::stream)
-                    .map(stream -> stream.mapToLong(Map.Entry::getValue))
-                    .mapToLong(LongStream::sum)
-                    .toArray();
+                .stream()
+                .collect(groupingBy(entry -> entry.getKey().charAt(0)))
+                .values()
+                .stream()
+                .map(Collection::stream)
+                .map(stream -> stream.mapToLong(Map.Entry::getValue))
+                .mapToLong(LongStream::sum)
+                .toArray();
 
             long mostCommonCount = Arrays.stream(characterCounts).max().orElseThrow();
             long leastCommonCount = Arrays.stream(characterCounts).min().orElseThrow();
