@@ -16,7 +16,11 @@ public class InputResourceReader implements AutoCloseable {
     }
 
     public Stream<String> readInput() {
-        InputStream is = clazz.getResourceAsStream("input");
+        return readInput("input");
+    }
+
+    public Stream<String> readInput(String filename) {
+        InputStream is = clazz.getResourceAsStream(filename);
         if (is == null) {
             System.out.println("Could not read input");
             return Stream.empty();
